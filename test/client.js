@@ -17,7 +17,7 @@ if (hasUserMedia()) {
 		
       //inserting our stream to the video tag     
       video.src = window.URL.createObjectURL(stream); 
-   }, function (err) {}); 
+   }, function (err) {console.log(err)}); 
 	
 } else { 
    alert("WebRTC is not supported"); 
