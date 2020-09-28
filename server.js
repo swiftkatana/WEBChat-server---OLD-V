@@ -1,9 +1,12 @@
 require('dotenv').config();
-const express = require('express');
-const socket = require('socket.io');
-const mongoose = require("mongoose");
-const { RateLimit } = require('./rateLimit');
-const { addMessageToAChat } = require('./models/Chat');
+
+ const express = require('express'),
+
+ socket = require('socket.io'),
+ mongoose = require("mongoose"),
+ 
+ { RateLimit } = require('./rateLimit'),
+ { addMessageToAChat } = require('./models/Chat');
 
 
 const rateLimit = new RateLimit();
@@ -17,9 +20,9 @@ mongoose.connect(process.env.DB_mongodb,{ useNewUrlParser: true, useUnifiedTopol
     else console.log("mongoDb connected")
 });
 
-
-const server = app.listen(1029,()=>{
-    console.log('listen to port 1029')
+let port = process.env.PORT||1029
+const server = app.listen(port,()=>{
+    console.log('listen to port '+port)
 });
 
 
@@ -27,9 +30,16 @@ const server = app.listen(1029,()=>{
 // static files
  require('./AppUses')(app)
 
-
 //socket setup
-const io =socket(server);
+let io =socket(server);
+
+
+app.get('/',(req,res)=>{
+    console.log(req.ip)
+  res.sendFile(__dirname+"/index.html");
+})
+console.log(__dirname+"\index.html");
+
 
 
 io.on('connection',(socket)=>{
@@ -50,7 +60,7 @@ io.on('connection',(socket)=>{
 
 })
 
-// setInterval(()=>console.log('10 sec pass'),10000);
+
 //routs
 require('./routes/friendsSystem')(app,io)
 require('./routes/userSystem')(app,io)

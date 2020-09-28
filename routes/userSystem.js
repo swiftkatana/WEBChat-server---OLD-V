@@ -6,6 +6,7 @@ const { User } = require('../models/User');
 const saltPassword =10;
 
 
+
 app.post("/login", (req, res) => {
 
     const {email,password,firstName,lastName} = req.body;
@@ -18,7 +19,7 @@ app.post("/login", (req, res) => {
             res.send('not found');
         }else{
             if(user){
-                    const {email,_id,firstName,lastName,imageProfile,friends} = user
+                    const {email,_id,firstName,lastName,imageProfile,connections} = user
                     bcrypt.compare(password,user.password,(err,login)=>{
                         if(err){
                             console.log('password not right\n'+err);
@@ -27,7 +28,7 @@ app.post("/login", (req, res) => {
 
                             if(login){
                                 console.log('someone login to our web sucssesfull email: '+email)
-                                    res.send({ email,_id,firstName,lastName,imageProfile,friends});
+                                    res.send({ email,_id,firstName,lastName,imageProfile,friends:connections,DOYBC:user.createDateOfUser});
                             }else {
                             console.log(req.ip + " just try login but not! password not good  :  "+email);
                             res.send('not found');
@@ -62,8 +63,7 @@ app.post("/register", (req, res) => {
         const user = new User({
             email,password:hash,firstName,lastName
         });
-        console.log(user)
-        const {_id,imageProfile,friends} = user
+        const {_id,imageProfile,connections} = user
 
         user.save(err=>{
             if(err){
@@ -73,7 +73,7 @@ app.post("/register", (req, res) => {
             }else{
                 console.log('someone register to our web now this email : '+email)
                 res.send({
-                    email,_id,firstName,lastName,imageProfile,friends
+                    email,_id,firstName,lastName,imageProfile,friends:connections,DOYBC:user.createDateOfUser
                 });
             }
 

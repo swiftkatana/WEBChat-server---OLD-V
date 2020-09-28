@@ -13,9 +13,9 @@ const userSchema = new mongoose.Schema({
     lastName:{type:String,},
     phone:String,
     address:String,
-    imageProfile:{type:String,default:'http://84.108.78.137:1029/profile.png'},
+    imageProfile:{type:String,default:'http://84.108.77.60:1029/profile.png'},
     chats:[String],
-    friends:{type:{},default:{}},
+    connections:{type:{},default:{}},
 });
 exports.userSchema = userSchema; 
 const User = mongoose.model("User", userSchema);
@@ -23,3 +23,20 @@ const User = mongoose.model("User", userSchema);
 exports.User = User;
 
 
+exports.requestChecker= function(user){
+const {DOYBC,_id}= user;
+
+User.findOne({_id},(err,user)=>{
+        if(user){
+            if(user.createDateOfUser===DOYBC){
+                return true
+            }
+        }
+        return false;
+
+
+})
+
+
+
+}

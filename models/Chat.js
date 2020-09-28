@@ -19,7 +19,9 @@ exports.Chat =  Chat;
 exports.CreateChat= CreateChat= (users,type,chatName)=>{
     if(!chatName) chatName='Change the Chat defualt name'
     const userObg={};
+    users[0] ['god']=true;
  users.forEach(user => {
+   
      userObg[user._id]=user;
  });
 const newChat = new Chat({
