@@ -5,6 +5,7 @@ function hasUserMedia() {
 } 
 
 if (hasUserMedia()) { 
+   console.log('wow')
    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia
       || navigator.mozGetUserMedia; 
 		
