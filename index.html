@@ -109,7 +109,7 @@
 			
 			function onSuccess(stream) {
 				console.log("Success! We have a stream!");
-				videoArea.src = window.URL.createObjectURL(stream);
+				videoArea.srcObject = stream;
 				videoArea.className = "grayscale_filter";
 				videoArea.play();
 			}
