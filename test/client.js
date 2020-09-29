@@ -39,7 +39,7 @@ function startStream(){
    }
    function getCameras(sourceInfos){
 
-      for (let i = 0; i < sourceInfos.length; i++) {
+      for (let i = 0; i !== sourceInfos.length; i++) {
             let sourceInfo = sourceInfos[i];
             var option = document.createElement('option')
             option.value = sourceInfo.id;
