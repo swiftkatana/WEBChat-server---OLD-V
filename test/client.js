@@ -10,6 +10,7 @@ videoSelect.onchange = startStream
 function startStream(){
    navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || 
       navigator.mozGetUserMedia); 
+      let videoSource = videoSelect.value;
       let constraintsV = 
       {
          audio:true,
@@ -19,7 +20,10 @@ function startStream(){
                maxWidth:640,
                minHeight:360,
                maxHeight:480
-            }
+            },
+            optional:[{
+               sourceId:videoSource
+            }]
          },
          
       };
