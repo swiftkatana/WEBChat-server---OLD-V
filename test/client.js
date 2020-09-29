@@ -13,7 +13,7 @@
   
    navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || 
       navigator.mozGetUserMedia); 
-let constraints = {audio:true,video:true};
+let constraints = {audio:true,video:false};
 let videoArea = document.querySelector("video");
  
 if (navigator.getUserMedia) {
