@@ -4,7 +4,7 @@ let videoArea = document.querySelector("video");
 let audioArea = document.querySelector("audio");
 let videoSelect = document.querySelector("#camera");
 
-
+videoSelect.onchange = startStream
 
 
 function startStream(){
@@ -43,7 +43,7 @@ function startStream(){
                option.text=sourceInfo.label ||'camera'+(videoSelect.length+1);
                videoSelect.appendChild(option);
             }
-            
+
 
 
       }
