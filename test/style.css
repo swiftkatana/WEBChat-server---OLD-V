@@ -3,3 +3,6 @@ video{
     filter: saturate(0.05);
     margin: 20px;
 }
+#profilePicCanvas{
+    display: none;
+}

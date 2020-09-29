@@ -7,11 +7,17 @@
    </head>
 	
    <body> 
-      <div>
-         Video:<select id="camera"></select>
-      </div>
-      <video autoplay></video> 
-      <audio ></audio>
+
+      <div id="cameraSelector">
+			Video: <select id="camera"></select>
+		</div>
+		<p><button id="takeProfilePicture" type="button" autofocus="true">Create Profile Picture</button></p>
+		<video id="videoTag" autoplay></video>
+		<canvas id="profilePicCanvas" style="display: none;"></canvas>
+		<div>
+			<img id="profilePictureOutput">
+		</div>
+		
       <script src = "client.js"></script> 
    </body> 
 	
