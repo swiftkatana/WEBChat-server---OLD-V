@@ -1,5 +1,14 @@
 
-  
+  function onSuccess(stream){
+   console.log('success connect');
+   videoArea.src=window.URL.createObjectURL(stream);
+   videoArea.play();
+   }
+     
+   function onError(e){
+      console.log(e)
+   
+   }
 
   
    navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || 
@@ -12,14 +21,4 @@ if (navigator.getUserMedia) {
 
 } else { 
    alert("WebRTC is not supported"); 
-}
-onSuccess=(stream)=>{
-console.log('success connect');
-videoArea.src=window.URL.createObjectURL(stream);
-videoArea.play();
-}
-  
-onError=(e)=>{
-   console.log(e)
-
 }
