@@ -13,7 +13,7 @@ let constraintsV = {audio:false,video:true};
    function onSuccessA(stream){
       console.log('success audioArea');
       audioArea.src=window.URL.createObjectURL(stream);
-      audioArea.play();
+   
       }
    function onError(e){
       console.log(e)
