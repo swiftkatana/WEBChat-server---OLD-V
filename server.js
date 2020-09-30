@@ -1,6 +1,6 @@
 require('dotenv').config();
 
- const express = require('express'),
+ const express = require('express.io'),
 
  socket = require('socket.io'),
  mongoose = require("mongoose"),
@@ -13,7 +13,7 @@ const rateLimit = new RateLimit();
 
 //App setup
 const app = express();
-
+app.http().io();
 
 mongoose.connect(process.env.DB_mongodb,{ useNewUrlParser: true, useUnifiedTopology: true },(err)=>{
     if(err) console.log(err)
@@ -41,38 +41,62 @@ app.get('/',(req,res)=>{
 console.log(__dirname+"\index.html");
 
 
+app.io.route('ready', function(req) {
+	req.io.join(req.data.chat_room);
+	req.io.join(req.data.signal_room);
+	app.io.room(req.data).broadcast('announce', {
+		message: 'New client in the ' + req.data + ' room.'
+	})
+})
 
-io.on('connection',(socket)=>{
-
-    socket.on('typeing',(data)=>{
-        socket.broadcast.emit('typeing'+data.chatId,data);
-    })
-
-    socket.on('chat',(data)=>{
-        if(!rateLimit.CheackRateLimit(data.senderId,10000)){
-            return null
-        }
-        io.sockets.emit('chat'+data.chatId,data);
-        addMessageToAChat(data);
+app.io.route('send', function(req) {
+    app.io.room(req.data.room).broadcast('message', {
+        message: req.data.message,
+		author: req.data.author
     });
+})
 
-    socket.on('ready',data=>{
-        socket.broadcast.emit('announce'+data,'new user enter');
-
-    })
-
-    socket.on('signal',(req)=>{
-        console.log(req)
-        socket.broadcast.emit('signaling_message'+req.room,{
-            type:req.type,
-            message:req.message
-        })
-
+app.io.route('signal', function(req) {
+	//Note the use of req here for broadcasting so only the sender doesn't receive their own messages
+	req.io.room(req.data.room).broadcast('signaling_message', {
+        type: req.data.type,
+		message: req.data.message
     });
+})
+
+
+
+// io.on('connection',(socket)=>{
+
+//     socket.on('typeing',(data)=>{
+//         socket.broadcast.emit('typeing'+data.chatId,data);
+//     })
+
+//     socket.on('chat',(data)=>{
+//         if(!rateLimit.CheackRateLimit(data.senderId,10000)){
+//             return null
+//         }
+//         io.sockets.emit('chat'+data.chatId,data);
+//         addMessageToAChat(data);
+//     });
+
+//     socket.on('ready',data=>{
+//         socket.broadcast.emit('announce'+data,'new user enter');
+
+//     })
+
+//     socket.on('signal',(req)=>{
+//         console.log(req)
+//         socket.broadcast.emit('signaling_message'+req.room,{
+//             type:req.type,
+//             message:req.message
+//         })
+
+//     });
 
    
 
-})
+// })
 
 
 //routs
