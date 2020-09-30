@@ -21,7 +21,7 @@ module.exports=(app)=>{
     // });
     app.use(express.static('test'))
     app.use(express.static('uploads'))
-    // app.use(express.static("build"));
+    app.use(express.static("build"));
     app.use(express.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(function(req, res, next) {

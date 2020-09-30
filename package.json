@@ -12,9 +12,12 @@
   "dependencies": {
     "@azure/storage-blob": "^12.2.0-preview.1",
     "bcrypt": "^5.0.0",
+    "coffee-script": "^1.12.7",
     "compression": "^1.7.4",
+    "connect": "^3.7.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express.io": "^1.1.13",
     "mongoose": "^5.9.26",
     "multer": "^1.4.2",
     "nodemon": "^2.0.4",

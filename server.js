@@ -36,7 +36,7 @@ let io =socket(server);
 
 app.get('/',(req,res)=>{
     console.log(req.ip)
-  res.sendFile(__dirname+"/index.html");
+  res.sendFile(__dirname+"/build/index.html");
 })
 console.log(__dirname+"\index.html");
 
@@ -54,6 +54,20 @@ io.on('connection',(socket)=>{
         }
         io.sockets.emit('chat'+data.chatId,data);
         addMessageToAChat(data);
+    });
+
+    socket.on('ready',data=>{
+        socket.broadcast.emit('announce'+data,'new user enter');
+
+    })
+
+    socket.on('signal',(req)=>{
+        console.log(req)
+        socket.broadcast.emit('signaling_message'+req.room,{
+            type:req.type,
+            message:req.message
+        })
+
     });
 
    
