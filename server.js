@@ -2,7 +2,6 @@ require('dotenv').config();
 
  const express = require('express.io'),
 
- socket = require('socket.io'),
  mongoose = require("mongoose"),
  
  { RateLimit } = require('./rateLimit'),
@@ -30,8 +29,6 @@ const server = app.listen(port,()=>{
 // static files
  require('./AppUses')(app)
 
-//socket setup
-let io =socket(server);
 
 
 app.get('/',(req,res)=>{
@@ -100,7 +97,7 @@ app.io.route('signal', function(req) {
 
 
 //routs
-require('./routes/friendsSystem')(app,io)
-require('./routes/userSystem')(app,io)
-require('./routes/chatsSystem')(app,io)
+require('./routes/friendsSystem')(app)
+require('./routes/userSystem')(app)
+require('./routes/chatsSystem')(app)
 
