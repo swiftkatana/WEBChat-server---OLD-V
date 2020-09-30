@@ -63,7 +63,7 @@ io.on('connection',(socket)=>{
 
     socket.on('signal',(req)=>{
         console.log(req)
-        socket.emit('signaling_message'+req.room,{
+        socket.broadcast.emit('signaling_message'+req.room,{
             type:req.type,
             message:req.message
         })
