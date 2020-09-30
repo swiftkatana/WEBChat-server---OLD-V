@@ -39,21 +39,26 @@ console.log(__dirname+"\index.html");
 
 
 app.io.route('ready', function(req) {
+    console.log(object)
+    console.log('dsa')
 	req.io.join(req.data.chat_room);
 	req.io.join(req.data.signal_room);
 	app.io.room(req.data).broadcast('announce', {
 		message: 'New client in the ' + req.data + ' room.'
 	})
 })
+app.io.route('typeing',(req)=>{
+    console.log(req)
+    app.io.room(req.data.chatId).broadcast('typeing'+req.data.chatId,req.data);
 
-app.io.route('send', function(req) {
-    app.io.room(req.data.room).broadcast('message', {
-        message: req.data.message,
-		author: req.data.author
-    });
+});
+app.io.route('chat', function(req) {
+    console.log(req)
+    app.io.room(req.data.chatId).emit('chat'+req.data.chatId, req.data);
 })
 
 app.io.route('signal', function(req) {
+    console.log(req)
 	//Note the use of req here for broadcasting so only the sender doesn't receive their own messages
 	req.io.room(req.data.room).broadcast('signaling_message', {
         type: req.data.type,
