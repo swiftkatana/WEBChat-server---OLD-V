@@ -6,7 +6,6 @@ const { User } = require('../models/User');
 const saltPassword =10;
 
 
-
 app.post("/login", (req, res) => {
 
     const {email,password,firstName,lastName} = req.body;

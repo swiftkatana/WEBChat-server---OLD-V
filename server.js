@@ -1,46 +1,36 @@
 require('dotenv').config();
+const  app = require('express')();
+const http =require('http').createServer(app);
+const  io = require('socket.io')(http);
+const  mongoose = require("mongoose");
+ 
+const { RateLimit } = require('./rateLimit');
+const  { addMessageToAChat } = require('./models/Chat');
 
- const express = require('express');
- const mongoose = require("mongoose");
- const socketIo = require('socket.io');
- const { RateLimit } = require('./rateLimit');
-const   { addMessageToAChat } = require('./models/Chat');
+
 
 
 const rateLimit = new RateLimit();
 
-//App setup
-const app = express();
-
-
-const port = process.env.PORT||1029;
-const server = app.listen(port,()=>{
-    console.log('listen to port '+port);
-});
-const io = new socketIo(server)
-
-
-
-
-// static files / middlewares
-require('./AppUses')(app);
-
-// DB 
-
 mongoose.connect(process.env.DB_mongodb,{ useNewUrlParser: true, useUnifiedTopology: true },(err)=>{
-    if(err) console.log(err);
-    else console.log("mongoDb connected");
+    if(err) console.log(err)
+    else console.log("mongoDb connected")
 });
 
- 
-// serve the website
+const port = process.env.PORT||1029
+
+http.listen(port,()=>{
+    console.log('listen to port '+port)
+});
+
+
 app.get('/',(req,res)=>{
-    console.log(req.ip);
+    console.log(req.ip)
   res.sendFile(__dirname+"/build/index.html");
-});
+})
 
 
-// routes for sockets on messages
+
 
 
 
@@ -48,7 +38,7 @@ io.on('connection',(socket)=>{
 
     socket.on('typeing',(data)=>{
         socket.broadcast.emit('typeing'+data.chatId,data);
-    })
+    });
 
     socket.on('chat',(data)=>{
         if(!rateLimit.CheackRateLimit(data.senderId,10000)){
@@ -61,7 +51,7 @@ io.on('connection',(socket)=>{
     socket.on('ready',data=>{
         socket.broadcast.emit('announce'+data,'new user enter');
 
-    })
+    });
 
     socket.on('signal',(req)=>{
         console.log(req)
@@ -74,9 +64,18 @@ io.on('connection',(socket)=>{
 
    
 
-})
+});
+
+// static files
+require('./AppUses')(app)
+
 
 //routs
-require('./routes/friendsSystem')(app);
-require('./routes/userSystem')(app);
-require('./routes/chatsSystem')(app);
+require('./routes/userSystem')(app,io)
+require('./routes/friendsSystem')(app,io)
+require('./routes/chatsSystem')(app,io)
+
+
+
+
+
