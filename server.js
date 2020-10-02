@@ -1,108 +1,82 @@
 require('dotenv').config();
 
- const express = require('express.io'),
-
- mongoose = require("mongoose"),
- 
- { RateLimit } = require('./rateLimit'),
- { addMessageToAChat } = require('./models/Chat');
+ const express = require('express');
+ const mongoose = require("mongoose");
+ const socketIo = require('socket.io');
+ const { RateLimit } = require('./rateLimit');
+const   { addMessageToAChat } = require('./models/Chat');
 
 
 const rateLimit = new RateLimit();
 
 //App setup
 const app = express();
-app.http().io();
+
+
+const port = process.env.PORT||1029;
+const server = app.listen(port,()=>{
+    console.log('listen to port '+port);
+});
+const io = new socketIo(server)
+
+
+
+
+// static files / middlewares
+require('./AppUses')(app);
+
+// DB 
 
 mongoose.connect(process.env.DB_mongodb,{ useNewUrlParser: true, useUnifiedTopology: true },(err)=>{
-    if(err) console.log(err)
-    else console.log("mongoDb connected")
+    if(err) console.log(err);
+    else console.log("mongoDb connected");
 });
 
-let port = process.env.PORT||1029
-const server = app.listen(port,()=>{
-    console.log('listen to port '+port)
-});
-
-
-
-// static files
- require('./AppUses')(app)
-
-
-
+ 
+// serve the website
 app.get('/',(req,res)=>{
-    console.log(req.ip)
+    console.log(req.ip);
   res.sendFile(__dirname+"/build/index.html");
-})
-console.log(__dirname+"\index.html");
-
-
-app.io.route('ready', function(req) {
-    console.log(object)
-    console.log('dsa')
-	req.io.join(req.data.chat_room);
-	req.io.join(req.data.signal_room);
-	app.io.room(req.data).broadcast('announce', {
-		message: 'New client in the ' + req.data + ' room.'
-	})
-})
-app.io.route('typeing',(req)=>{
-    console.log(req)
-    app.io.room(req.data.chatId).broadcast('typeing'+req.data.chatId,req.data);
-
 });
-app.io.route('chat', function(req) {
-    console.log(req)
-    app.io.room(req.data.chatId).emit('chat'+req.data.chatId, req.data);
-})
 
-app.io.route('signal', function(req) {
-    console.log(req)
-	//Note the use of req here for broadcasting so only the sender doesn't receive their own messages
-	req.io.room(req.data.room).broadcast('signaling_message', {
-        type: req.data.type,
-		message: req.data.message
+
+// routes for sockets on messages
+
+
+
+io.on('connection',(socket)=>{
+
+    socket.on('typeing',(data)=>{
+        socket.broadcast.emit('typeing'+data.chatId,data);
+    })
+
+    socket.on('chat',(data)=>{
+        if(!rateLimit.CheackRateLimit(data.senderId,10000)){
+            return null
+        }
+        io.sockets.emit('chat'+data.chatId,data);
+        addMessageToAChat(data);
     });
-})
 
+    socket.on('ready',data=>{
+        socket.broadcast.emit('announce'+data,'new user enter');
 
+    })
 
-// io.on('connection',(socket)=>{
+    socket.on('signal',(req)=>{
+        console.log(req)
+        socket.broadcast.emit('signaling_message'+req.room,{
+            type:req.type,
+            message:req.message
+        })
 
-//     socket.on('typeing',(data)=>{
-//         socket.broadcast.emit('typeing'+data.chatId,data);
-//     })
-
-//     socket.on('chat',(data)=>{
-//         if(!rateLimit.CheackRateLimit(data.senderId,10000)){
-//             return null
-//         }
-//         io.sockets.emit('chat'+data.chatId,data);
-//         addMessageToAChat(data);
-//     });
-
-//     socket.on('ready',data=>{
-//         socket.broadcast.emit('announce'+data,'new user enter');
-
-//     })
-
-//     socket.on('signal',(req)=>{
-//         console.log(req)
-//         socket.broadcast.emit('signaling_message'+req.room,{
-//             type:req.type,
-//             message:req.message
-//         })
-
-//     });
+    });
 
    
 
-// })
-
+})
 
 //routs
-require('./routes/friendsSystem')(app)
-require('./routes/userSystem')(app)
-require('./routes/chatsSystem')(app)
-
+require('./routes/friendsSystem')(app);
+require('./routes/userSystem')(app);
+require('./routes/chatsSystem')(app);
