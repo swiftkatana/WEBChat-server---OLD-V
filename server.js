@@ -40,7 +40,9 @@ io.on('connection',(socket)=>{
         socket.broadcast.emit('typeing'+data.chatId,data);
     });
 
-    socket.on('chat',(data)=>{
+    socket.on('chat',(data)=>
+    {
+        console.log('message ',data)
         if(!rateLimit.CheackRateLimit(data.senderId,10000)){
             return null
         }
