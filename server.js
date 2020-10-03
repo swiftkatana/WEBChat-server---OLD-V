@@ -60,7 +60,7 @@ io.on('connection',(socket)=>{
         socket.broadcast.emit('signaling_message'+req.room,{
             type:req.type,
             message:req.message
-        })
+        });
 
     });
 
