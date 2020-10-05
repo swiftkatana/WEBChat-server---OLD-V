@@ -108,7 +108,6 @@ const {User} = require('../models/User');
         const data = await  CreateChat(users,type,chatName);
 
         if(data.err){
-            console.log(data.err)
             res.send(data.err);
         }else{
             res.send(data.id);

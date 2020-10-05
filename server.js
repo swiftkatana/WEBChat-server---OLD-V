@@ -19,15 +19,18 @@ mongoose.connect(process.env.DB_mongodb,{ useNewUrlParser: true, useUnifiedTopol
 
 const port = process.env.PORT||1029
 
-http.listen(port,()=>{
-    console.log('listen to port '+port)
-});
 
 
 app.get('/',(req,res)=>{
     console.log(req.ip)
   res.sendFile(__dirname+"/build/index.html");
 })
+
+
+
+
+
+
 
 
 const connections = [];
@@ -38,21 +41,7 @@ io.on('connection', socket => {
   connections.push(socket);
   clients.push({ socket_id: socket.id });
   console.log('Connected: %s sockets connected ', connections.length);
-  //my code
-        socket.on('typeing',(data)=>{
-            socket.to(data.chatId).emit('typeing'+data.chatId,data);
-        });
 
-        socket.on('chat',(data)=>
-        {
-            console.log('message ',data)
-            if(!rateLimit.CheackRateLimit(data.senderId,10000)){
-                return null
-            }
-            socket.to(data.chatId).emit('chat'+data.chatId,data);
-            addMessageToAChat(data);
-        });
-        //not my 
   socket.on('join', (room, callback) => {
     const clients = io.sockets.adapter.rooms[room];
     const numClients = (typeof clients !== 'undefined') ? clients.length : 0;
@@ -103,21 +92,27 @@ io.on('connection', socket => {
 
 
 
+
+
+
+
+
+
 // io.on('connection',(socket)=>{
+
+//     console.log('connect')
 //     socket.on('typeing',(data)=>{
 //         socket.broadcast.emit('typeing'+data.chatId,data);
 //     });
 
 //     socket.on('chat',(data)=>
 //     {
-//         console.log('message ',data)
 //         if(!rateLimit.CheackRateLimit(data.senderId,10000)){
 //             return null
 //         }
 //         io.sockets.emit('chat'+data.chatId,data);
 //         addMessageToAChat(data);
 //     });
-
 
 //     socket.on('ready',data=>{
 //         socket.broadcast.emit('announce'+data,'new user enter');
@@ -150,3 +145,6 @@ require('./routes/chatsSystem')(app,io)
 
 
 
+http.listen(port,()=>{
+    console.log('listen to port '+port)
+});
