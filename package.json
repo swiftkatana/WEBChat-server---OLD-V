@@ -24,6 +24,7 @@
     "nodemon": "^2.0.4",
     "peer": "^0.5.3",
     "plivo": "^4.7.0",
+    "react-rtc-real": "^1.11.22",
     "socket.io": "^2.3.0"
   }
 }
