@@ -1,7 +1,7 @@
 require('dotenv').config();
 const  app = require('express')();
 const server =require('http').createServer(app);
-const  io = require('socket.io')(server);
+// const  io = require('socket.io')(server);
 const  mongoose = require("mongoose");
 const SignalServer = require('react-rtc-real/server/SignalServer.js'); 
 const signal = new SignalServer({ server });
@@ -41,48 +41,48 @@ app.get('/',(req,res)=>{
 
 
 
-io.on('connection',(socket)=>{
+// io.on('connection',(socket)=>{
 
-    console.log('connect')
-    socket.on('typeing',(data)=>{
-        socket.broadcast.emit('typeing'+data.chatId,data);
-    });
+//     console.log('connect')
+//     socket.on('typeing',(data)=>{
+//         socket.broadcast.emit('typeing'+data.chatId,data);
+//     });
 
-    socket.on('chat',(data)=>
-    {
-        if(!rateLimit.CheackRateLimit(data.senderId,10000)){
-            return null
-        }
-        io.sockets.emit('chat'+data.chatId,data);
-        addMessageToAChat(data);
-    });
+//     socket.on('chat',(data)=>
+//     {
+//         if(!rateLimit.CheackRateLimit(data.senderId,10000)){
+//             return null
+//         }
+//         io.sockets.emit('chat'+data.chatId,data);
+//         addMessageToAChat(data);
+//     });
 
-    socket.on('ready',data=>{
-        socket.broadcast.emit('announce'+data,'new user enter');
+//     socket.on('ready',data=>{
+//         socket.broadcast.emit('announce'+data,'new user enter');
 
-    });
+//     });
 
-    socket.on('signal',(req)=>{
-        console.log(req)
-        socket.broadcast.emit('signaling_message'+req.room,{
-            type:req.type,
-            message:req.message
-        });
+//     socket.on('signal',(req)=>{
+//         console.log(req)
+//         socket.broadcast.emit('signaling_message'+req.room,{
+//             type:req.type,
+//             message:req.message
+//         });
 
-    });
+//     });
 
    
 
-});
+// });
 
 // static files
 require('./AppUses')(app)
 
 
 //routs
-require('./routes/userSystem')(app,io)
-require('./routes/friendsSystem')(app,io)
-require('./routes/chatsSystem')(app,io)
+require('./routes/userSystem')(app,)
+require('./routes/friendsSystem')(app,)
+require('./routes/chatsSystem')(app,)
 
 
 
