@@ -17,14 +17,9 @@
     "connect": "^3.7.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "express.io": "^1.1.13",
-    "jshint": "^2.12.0",
     "mongoose": "^5.9.26",
     "multer": "^1.4.2",
     "nodemon": "^2.0.4",
-    "peer": "^0.5.3",
-    "plivo": "^4.7.0",
-    "react-rtc-real": "^1.11.22",
     "socket.io": "^2.3.0"
   }
 }
