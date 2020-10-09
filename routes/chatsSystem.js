@@ -4,9 +4,7 @@ const {Chat,CreateChat} = require('../models/Chat');
 const {User} = require('../models/User');
 
         app.post('/api/chat/getChat',(req,res)=>{
-        console.log('get chat')
         const chatid = req.body.chatId;
-        console.log(req.body)
         Chat.findOne({_id:chatid},(err,chat)=>{
             if(err){
                 console.log(err)

@@ -1,4 +1,4 @@
-module.exports = function(app,io){
+module.exports = function(app,io,users){
 const bcrypt =require('bcrypt');
 
 const { User } = require('../models/User');
@@ -7,43 +7,47 @@ const saltPassword =10;
 
 
 app.post("/login", (req, res) => {
-
     const {email,password,firstName,lastName} = req.body;
    
 
   
     User.findOne({email:email},(err,user)=>{
-        if(err){
-            console.log(err);
-            res.send('not found');
-        }else{
-            if(user){
-                    const {email,_id,firstName,lastName,imageProfile,connections} = user
-                    bcrypt.compare(password,user.password,(err,login)=>{
-                        if(err){
-                            console.log('password not right\n'+err);
-                            res.send('not found');
+            if(err){
+                console.log(err);
+                res.send({err:'notFound'});
+            }else{
+                if(user){
+                        const {email,_id,firstName,lastName,imageProfile,connections} = user
+                        if(users[email]){
+                            res.send({err:'alreadyLogin'});
+                            res.end();
+                            
                         }else{
 
-                            if(login){
-                                console.log('someone login to our web sucssesfull email: '+email)
-                                    res.send({ email,_id,firstName,lastName,imageProfile,friends:connections,DOYBC:user.createDateOfUser});
-                            }else {
-                            console.log(req.ip + " just try login but not! password not good  :  "+email);
-                            res.send('not found');
-                            }
-
+                            bcrypt.compare(password,user.password,(err,login)=>{
+                                if(err){
+                                    console.log('password not right\n'+err);
+                                    res.send({err:'notFound'});
+                                }else{
+            
+                                    if(login){
+                                        console.log('someone login to our web sucssesfull email: '+email)
+                                        res.send({ email,_id,firstName,lastName,imageProfile,friends:connections,DOYBC:user.createDateOfUser});
+                                    }else {
+                                        console.log(req.ip + " just try login but not! password not good  :  "+email);
+                                        res.send({err:'notFound'});
+                                    }
+            
+                                }
+            
+                            }); 
                         }
 
-                    }); 
-
-              }
-            else {
-    console.log(req.ip + " just try login but not! user not found :  "+email);
-
-                res.send('not found')
+                }else {
+                        console.log(req.ip + " just try login but not! user not Found :  "+email);
+                        res.send({err:'notFound'})
+                }
             }
-        }
     });
    
 });
