@@ -14,7 +14,7 @@ app.post("/login", (req, res) => {
     User.findOne({email:email},(err,user)=>{
             if(err){
                 console.log(err);
-                res.send({err:'notFound'});
+                res.send({err:'InfoWrong'});
             }else{
                 if(user){
                         const {email,_id,firstName,lastName,imageProfile,connections} = user
@@ -27,7 +27,7 @@ app.post("/login", (req, res) => {
                             bcrypt.compare(password,user.password,(err,login)=>{
                                 if(err){
                                     console.log('password not right\n'+err);
-                                    res.send({err:'notFound'});
+                                    res.send({err:'InfoWrong'});
                                 }else{
             
                                     if(login){
@@ -35,7 +35,7 @@ app.post("/login", (req, res) => {
                                         res.send({ email,_id,firstName,lastName,imageProfile,friends:connections,DOYBC:user.createDateOfUser});
                                     }else {
                                         console.log(req.ip + " just try login but not! password not good  :  "+email);
-                                        res.send({err:'notFound'});
+                                        res.send({err:'InfoWrong'});
                                     }
             
                                 }
@@ -45,7 +45,7 @@ app.post("/login", (req, res) => {
 
                 }else {
                         console.log(req.ip + " just try login but not! user not Found :  "+email);
-                        res.send({err:'notFound'})
+                        res.send({err:'userNotCreate'})
                 }
             }
     });
