@@ -33,7 +33,7 @@ console.clear()
 let users ={};
 setInterval(()=>console.log('amount of users connected  :',Object.keys(users).length),600000)
 
-io.on('socket',(socket)=>{
+io.on('connect',(socket)=>{
   console.log('connect')
 
 
