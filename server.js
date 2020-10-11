@@ -41,21 +41,20 @@ io.on('connect',(socket)=>{
 
   socket.on('loginToTheWebSite',name=>{
     //if anyone is logged in with this username then refuse 
-    if(users[name]) { 
-    console.log("two users try to be on the same time id:", name); 
+    if(!users[name]) { 
 
-
-    } else { 
        //save user socket on the server 
        users[name] = socket; 
        socket.name = name; 
        console.log("User logged:", name); 
 
        socket.send(true);
-
-           
+  
     } 
   });
+  socket.on('message',data=>{
+    console.log('message',data)
+  })
   
   
   
