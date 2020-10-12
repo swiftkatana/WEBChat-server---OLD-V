@@ -33,7 +33,7 @@ module.exports=(app)=>{
       });
     // app.use('/api/user',(req,res,next)=>{
     //   console.log(req.body)
-    //   if(requestChecker(req.body.id )) {
+    //   if(requestChecker(req.body.id )) {s
         
     //     console.log(req.ip);
     //     next();
