@@ -3,11 +3,11 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const { User } = require("../models/User");
 const saltPassword = 10;
-const responedList = require("../respondList");
+const { responedList } = require("../respondList");
 const router = express.Router();
 
 router.post("/login", (req, res) => {
-  const { email, password, firstName, lastName } = req.body;
+  const { email, password } = req.body;
 
   User.findOne({ email: email }, (err, user) => {
     if (err) {
@@ -23,8 +23,8 @@ router.post("/login", (req, res) => {
           imageProfile,
           connections,
         } = user;
-        if (users[email]) {
-          res.send({ err: "alreadyLogin" });
+        if (req.users[email]) {
+          res.send(responedList.loginFaildAlreadyConnect);
           res.end();
         } else {
           bcrypt.compare(password, user.password, (err, login) => {
@@ -42,7 +42,7 @@ router.post("/login", (req, res) => {
                   firstName,
                   lastName,
                   imageProfile,
-                  friends: connections,
+                  connections,
                   DOYBC: user.createDateOfUser,
                 });
               } else {
@@ -60,7 +60,7 @@ router.post("/login", (req, res) => {
         console.log(
           req.ip + " just try login but not! user not Found :  " + email
         );
-        res.send({ err: "userNotCreate" });
+        res.send(responedList.usersNotFound);
       }
     }
   });
@@ -72,7 +72,7 @@ router.post("/register", (req, res) => {
   bcrypt.hash(password, saltPassword, (err, hash) => {
     if (err) {
       console.log(err);
-      res.send(err.message);
+      res.send(responedList.DBError);
     }
 
     const user = new User({
@@ -86,8 +86,8 @@ router.post("/register", (req, res) => {
     user.save((err) => {
       if (err) {
         console.log("someone try to register but got error : " + err);
-        if (err.code === 11000) res.send("dup");
-        else res.send(err.message);
+        if (err.code === 11000) res.send(responedList.UserIsAlreadyCreated);
+        else res.send(responedList.DBError);
       } else {
         console.log("someone register to our web now this email : " + email);
         res.send({
@@ -103,3 +103,5 @@ router.post("/register", (req, res) => {
     });
   });
 });
+
+module.exports = router;
