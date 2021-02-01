@@ -39,20 +39,18 @@ setInterval(
 require("./AppUses")(app);
 
 //routs
+app.use('/api/*', (req, res, next) => {
+  req.users = users;
+  req.io = io;
+  next();
+})
+
 app.use(
-  "/api/user",
-  (req, res, next) => {
-    req.users = users;
-    next();
-  },
-  userSystem
+  "/api/user", logi
 );
 app.use(
   "/api/user",
-  (req, res, next) => {
-    req.io = io;
-    next();
-  },
+ ,
   friendSystem
 );
 app.use(
