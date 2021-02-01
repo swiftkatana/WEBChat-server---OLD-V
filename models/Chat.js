@@ -36,14 +36,21 @@ exports.CreateChat = CreateChat = (users, type, chatName) => {
   return { _id: newChat._id };
 };
 
-exports.addMessageToAChat = (message) => {
-  Chat.findById(message.chatId, (err, chat) => {
-    chat.messages.push(message);
-    chat.markModified("messages");
-    chat.save((err) => {
-      if (err) {
-        console.log("error cant save message");
-      }
-    });
+exports.addMessageToAChat = async (message) => {
+  let chat = await Chat.findOne({ _id: message.chatId })
+    .then((doc) => doc || responedList.NotExists)
+    .catch((err) => responedList.DBError);
+  if (chat.err) {
+    return chat;
+  }
+  chat.messages.push(message);
+  chat.markModified("messages");
+  chat.save((err) => {
+    if (err) {
+      console.log("error cant save message");
+    }
   });
+
+  return Object.keys(chat.users);
+
 };

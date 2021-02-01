@@ -16,8 +16,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: process.env.SERVER_IP + "/profile.png",
   },
-  chats: [String],
+  chats: { type: {}, default: {} },
   connections: { type: {}, default: {} },
+});
+userSchema.method("filterUser", function () {
+  let filterUser = { ...this._doc };
+  filterUser.password =
+    "aGFoYWhhIHlvdSB0aGluayB0aGF0IGlzIHRoZSBwYXNzd29yZCBoYWhhaGFoYWhh ";
+  return filterUser;
 });
 exports.userSchema = userSchema;
 const User = mongoose.model("User", userSchema);
@@ -34,39 +40,5 @@ exports.requestChecker = function (user) {
       }
     }
     return false;
-  });
-};
-
-exports.UpdateFriends = async function (sender, geter) {
-  const docSender = await User.findOne({ _id: sender._id })
-    .catch((err) => responedList.DBError)
-    .then((doc) => doc || responedList.usersNotFound);
-  if (docSender.err) {
-    res.send(docSender);
-  }
-
-  const docGeter = await User.findOne({ _id: geter._id })
-    .catch((err) => responedList.DBError)
-    .then((doc) => doc || responedList.usersNotFound);
-  if (docGeter.err) {
-    return docGeter;
-  }
-
-  docSender.connections[geter._id] = geter;
-  docGeter.connections[sender._id] = sender;
-  docGeter.markModified("connections");
-  docSender.markModified("connections");
-  docGeter.save((err) => {
-    if (err) {
-      return responedList.FaildSave;
-    }
-
-    docSender.save((err) => {
-      if (err) {
-        return responedList.FaildSave;
-      } else {
-        return {};
-      }
-    });
   });
 };
