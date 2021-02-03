@@ -6,9 +6,14 @@ const mongoose = require("mongoose");
 
 const { RateLimit } = require("./rateLimit");
 const { addMessageToAChat } = require("./models/Chat");
-const userSystem = require("./routes/userRoute");
-const friendSystem = require("./routes/friendRoute");
-const chatRoute = require("./routes/chatsRoute");
+
+const { loginRoute } = require("./routes/user/loginRoute");
+const { registerRoute } = require("./routes/user/registerRoute");
+const { blockRequestRoute } = require("./routes/friends/blockRequestRoute");
+const { deleteFriendRoute } = require("./routes/friends/deleteFriendRoute");
+const { friendReqAcceptRoute } = require("./routes/friends/friendReqAcceptRoute");
+const { getFriends } = require("./routes/friends/getFriendsRoute");
+
 const rateLimit = new RateLimit();
 
 mongoose.connect(
@@ -29,9 +34,10 @@ app.get("/", (req, res) => {
 
 console.clear();
 
-let users = {};
+let OnlineUsers = {};
+
 setInterval(
-  () => console.log("amount of users connected  :", Object.keys(users).length),
+  () => console.table("OnlineUsers connected  :", OnlineUsers),
   600000
 );
 
@@ -40,27 +46,26 @@ require("./AppUses")(app);
 
 //routs
 app.use('/api/*', (req, res, next) => {
-  req.users = users;
+  req.users = OnlineUsers;
   req.io = io;
   next();
 })
 
-app.use(
-  "/api/user", logi
-);
-app.use(
-  "/api/user",
- ,
-  friendSystem
-);
-app.use(
-  "/api/chat",
-  (req, res, next) => {
-    req.io = io;
-    next();
-  },
-  chatRoute
-);
+
+app.use("/api/user", loginRoute,);
+app.use("/api/user", registerRoute,);
+
+app.use("/api/friends", blockRequestRoute);
+app.use("/api/friends", deleteFriendRoute);
+app.use("/api/friends", friendReqAcceptRoute);
+app.use("/api/friends", getFriends);
+app.use("/api/friends", getUsersForSearchRoute);
+app.use("/api/friends",);
+
+
+
+
+app.use("/api/chat", chatRoute);
 
 console.clear();
 console.log(
@@ -70,22 +75,32 @@ server.listen(port, () => {
   console.log("listen to port " + port);
 });
 
+
+updateUser = (email) => {
+  OnlineUsers[email].lastTimeUseAt = Date.now();
+}
+
+
 io.on("connect", (socket) => {
   socket.on("loginToTheWebSite", (email) => {
     //if anyone is logged in with this useremail then refuse
-    if (!users[email]) {
+    if (!OnlineUsers[email]) {
       //save user socket on the server
-      users[email] = socket;
       socket.email = email;
+      OnlineUsers[email] = socket;
     }
+    updateUser(email);
+
   });
   socket.on("typeing", (data) => {
+    updateUser(socket.email);
     socket.broadcast.emit("typeing" + data.chatId, data);
   });
 
   socket.on("message", async (data) => {
+    updateUser(socket.email);
     console.log(data);
-    if (!rateLimit.CheackRateLimit(data.senderId, 10000)) {
+    if (!rateLimit.CheackRateLimit(socket.email, 10000)) {
       return null;
     }
     let ids = await addMessageToAChat(data);
@@ -99,13 +114,13 @@ io.on("connect", (socket) => {
 
   socket.on("leave", () => {
     // console.log("user just logout from the server : " + socket.email);
-    delete users[socket.email];
+    delete OnlineUsers[socket.email];
   });
 
   socket.on("disconnect", () => {
     if (socket.email) {
       // console.log("user just disconnected from the server : " + socket.email);
-      delete users[socket.email];
+      delete OnlineUsers[socket.email];
     }
     // else console.log("user just disconnected from the server : ");
   });

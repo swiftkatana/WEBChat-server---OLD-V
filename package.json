@@ -17,6 +17,7 @@
     "connect": "^3.7.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "legit": "^1.0.9",
     "mongoose": "^5.9.26",
     "multer": "^1.4.2",
     "nodemon": "^2.0.4",

@@ -6,40 +6,45 @@ const { responedList } = require("../../respondList");
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    res.send(responedList.infoInvalid);
-    return;
-  }
+  try {
+    const { email, password } = req.body;
 
-  let user = await User.findOne({ email })
-    .catch((err) => responedList.DBError)
-    .then((user) => user || responedList.usersNotFound);
-  if (user.err) {
-    res.send(user);
-    return;
-  }
-
-  bcrypt.compare(password, user.password, (err, login) => {
-    if (err) {
-      console.log("password not right\n" + err);
+    if (!email || !password) {
       res.send(responedList.infoInvalid);
       return;
     }
-    if (login) {
-      if (req.users[email]) {
-        res.send(responedList.loginFaildAlreadyConnect);
-        return;
-      }
-      res.send(user.filterUser());
-      // console.log("someone login to our web sucssesfull email: " + email);
-    } else {
-      console.log(
-        req.ip + " just try login but not! password not good  :  " + email
-      );
-      res.send(responedList.infoInvalid);
+
+    let user = await User.findOne({ email })
+
+    if (!user) {
+      res.send(responedList.usersNotFound);
+      return;
     }
-  });
+
+    user.loginAt = Date.now();
+
+    await user.save();
+
+
+
+    const match = await bcrypt.compare(password, user.password)
+
+    if (!match) {
+      console.log("password not right\n" + err);
+      res.send(responedList.usersNotFound);
+      return;
+    }
+    if (req.users[email]) {
+      //  if the user already login we will kick him/her from the web and login from a new tab
+      // need to create  ---!!!!!!!!
+
+    }
+    res.send(user.filterUser());
+
+  } catch (error) {
+    res.send(responedList.DBError);
+  }
+
 });
 
 

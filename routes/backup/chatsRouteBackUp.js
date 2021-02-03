@@ -1,7 +1,7 @@
 const express = require("express");
-const { Chat, CreateChat } = require("../models/Chat");
-const { User } = require("../models/User");
-const { responedList } = require("../respondList");
+const { Chat, CreateChat } = require("../../models/Chat");
+const { User } = require("../../models/User");
+const { responedList } = require("../../respondList");
 const router = express.Router();
 router.post("/getChat", (req, res) => {
   const { chatId } = req.body;

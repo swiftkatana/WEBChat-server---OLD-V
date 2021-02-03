@@ -9,7 +9,25 @@ const chatMessageSchima = mongoose.Schema({
     chatId: String,
     createTime: {}
 })
+const ChatMessageDB = mongoose.model('ChatMessage', chatMessageSchima);
 exports.chatMessageSchima = chatMessageSchima;
+exports.ChatMessageDB = ChatMessageDB
 
 
-exports.ChatMessage = mongoose.model('ChatMessage', chatMessageSchima)
+
+exports.createNewMessage = async (message) => {
+    try {
+        let message = new ChatMessageDB({ ...message });
+        await message.save()
+
+        return { message };
+
+    } catch (error) {
+
+        throw error;
+
+    }
+
+
+};
+

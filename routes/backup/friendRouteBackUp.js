@@ -1,7 +1,7 @@
 const express = require("express");
-const { responedList } = require("../respondList");
-const { User, UpdateFriends } = require("../models/User");
-const { CreateChat } = require("../models/Chat");
+const { responedList } = require("../../respondList");
+const { User, UpdateFriends } = require("../../models/User");
+const { CreateChat } = require("../../models/Chat");
 
 const router = express.Router();
 // there  are few types of status that a frirend can have
