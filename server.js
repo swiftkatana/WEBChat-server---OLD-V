@@ -5,31 +5,28 @@ const io = require("socket.io")(server);
 const mongoose = require("mongoose");
 
 const { RateLimit } = require("./rateLimit");
-const { addMessageToAChat } = require("./models/Chat");
+const { addMessageToAChat } = require("./src/models/Chat");
 
-const { loginRoute } = require("./routes/user/loginRoute");
-const { registerRoute } = require("./routes/user/registerRoute");
-const { blockRequestRoute } = require("./routes/friends/blockRequestRoute");
-const { deleteFriendRoute } = require("./routes/friends/deleteFriendRoute");
-const { friendReqAcceptRoute } = require("./routes/friends/friendReqAcceptRoute");
-const { getFriends } = require("./routes/friends/getFriendsRoute");
+const { loginRoute } = require("./src/routes/user/loginRoute");
+const { registerRoute } = require("./src/routes/user/registerRoute");
+
+const { blockRequestRoute } = require("./src/routes/friends/blockRequestRoute");
+const { deleteFriendRoute } = require("./src/routes/friends/deleteFriendRoute");
+const { friendReqAcceptRoute } = require("./src/routes/friends/friendReqAcceptRoute");
+const { getFriends } = require("./src/routes/friends/getFriendsRoute");
+const { getUsersForSearchRoute } = require("./src/routes/friends/getUsersForSerachRoute");
+const { sendFriendRequestRoute } = require("./src/routes/friends/sendFriendRequestRoute");
+const { chatRoutechatRoute } = require("./src/routes/backup/chatsRouteBackUp");
+const { createNewMessage } = require("./src/models/ChatMeassge");
+const { connectDatabase } = require("./src/config/mongoDB");
 
 const rateLimit = new RateLimit();
-
-mongoose.connect(
-  process.env.DB_mongodb,
-  { useNewUrlParser: true, useUnifiedTopology: true },
-  (err) => {
-    if (err) console.log(err);
-    else console.log("mongoDb connected");
-  }
-);
-
+connectDatabase();
 const port = process.env.PORT || 1029;
 
 app.get("/", (req, res) => {
   console.log(req.ip);
-  res.sendFile(__diremail + "/build/index.html");
+  res.sendFile(__dirname + "/build/index.html");
 });
 
 console.clear();
@@ -37,7 +34,7 @@ console.clear();
 let OnlineUsers = {};
 
 setInterval(
-  () => console.table("OnlineUsers connected  :", OnlineUsers),
+  () => console.log("OnlineUsers connected  :", Object.keys(OnlineUsers)),
   600000
 );
 
@@ -51,7 +48,6 @@ app.use('/api/*', (req, res, next) => {
   next();
 })
 
-
 app.use("/api/user", loginRoute,);
 app.use("/api/user", registerRoute,);
 
@@ -60,12 +56,10 @@ app.use("/api/friends", deleteFriendRoute);
 app.use("/api/friends", friendReqAcceptRoute);
 app.use("/api/friends", getFriends);
 app.use("/api/friends", getUsersForSearchRoute);
-app.use("/api/friends",);
+app.use("/api/friends", sendFriendRequestRoute);
 
 
-
-
-app.use("/api/chat", chatRoute);
+app.use("/api/chat", chatRoutechatRoute);
 
 console.clear();
 console.log(
@@ -87,6 +81,7 @@ io.on("connect", (socket) => {
     if (!OnlineUsers[email]) {
       //save user socket on the server
       socket.email = email;
+      console.log('someone is logged in with this email', email);
       OnlineUsers[email] = socket;
     }
     updateUser(email);
@@ -103,6 +98,7 @@ io.on("connect", (socket) => {
     if (!rateLimit.CheackRateLimit(socket.email, 10000)) {
       return null;
     }
+    createNewMessage(data);
     let ids = await addMessageToAChat(data);
     if (ids.err) {
       console.log('i got error on sending message');
