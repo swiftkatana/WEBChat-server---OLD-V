@@ -8,6 +8,8 @@ module.exports.responedList = {
   // error when someone try to login but user not exists or wrong info
   usersNotFound: { error: "usersNotFound" },
 
+  searchUsersForFriend: { error: "searchUsersForFriend" },
+
   // error when someone try to use a fake or not exists email
   emailNotExistsL: { error: "emailIsFake" },
   // error when the DB cant find something

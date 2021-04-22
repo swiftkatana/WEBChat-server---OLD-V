@@ -1,6 +1,8 @@
 const express = require("express");
 const { User } = require("../../models/User");
 const { responedList } = require("../../../respondList");
+const { FriendDB } = require("../../models/friend");
+const { CreateChat } = require("../../models/Chat");
 
 const router = express.Router();
 
@@ -26,39 +28,21 @@ router.post("/sendfriendrequest", async (req, res) => {
       res.status(400).send(responedList.usersNotFound);
       return;
     }
-    let senderIngeter = docgeter.connections[sender._id]
-    let geterInsender = docsender.connections[geter._id]
-    if (geterInsender || senderIngeter) {
-
-      if (senderIngeter.status !== 'delete' || geterInsender.status !== 'delete') {
-        res.send({ error: "try to send a bad connection " });
-        return;
-
-      }
-    }
-
-
-
-    let todayDate = Date.now();
-    docgeter.updateAt = todayDate;
-    docsender.updateAt = todayDate;
-
-    docgeter.connections[docsender._id] = sender;
-    docsender.connections[docgeter._id] = geter;
-
-    docgeter.markModified("connections");
-    docsender.markModified("connections");
 
     geter.status = "geter";
     sender.status = "sender";
     geter._id = docgeter._id;
     sender._id = docsender._id;
+    const chat = await CreateChat([docsender._id, docgeter._id], "friends");
+    let newFriendShip = await FriendDB.createFriendShip(docsender._id, docgeter._id, chat._id);
+    newFriendShip.sendReq(docsender._id)
 
+    let todayDate = Date.now();
+    docgeter.updateAt = todayDate;
+    docsender.updateAt = todayDate;
 
-
-    // await docgeter.save();
-    // await docsender.save()
-    console.log(docgeter._id)
+    await docgeter.save();
+    await docsender.save()
     req.io.emit("userLive" + docgeter._id, { data: sender, type: "NEW_FRIEND_REQUEST" });
     res.send({ user: geter });
 

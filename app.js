@@ -2,7 +2,6 @@ require("dotenv").config();
 const app = require("express")();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
-const mongoose = require("mongoose");
 
 const { RateLimit } = require("./rateLimit");
 const { addMessageToAChat } = require("./src/models/Chat");
@@ -47,7 +46,7 @@ app.use('/api/*', (req, res, next) => {
   req.io = io;
   next();
 })
-
+app.set('host', process.env.HOST || 'localhost');
 app.use("/api/user", loginRoute,);
 app.use("/api/user", registerRoute,);
 
@@ -61,7 +60,6 @@ app.use("/api/friends", sendFriendRequestRoute);
 
 app.use("/api/chat", chatRoutechatRoute);
 
-console.clear();
 console.log(
   "--------------------------------------------------------------------------------------------------------------------------------"
 );
@@ -108,8 +106,8 @@ io.on("connect", (socket) => {
       });
   });
 
-  socket.on("leave", () => {
-    // console.log("user just logout from the server : " + socket.email);
+  socket.on("sgin out", () => {
+    console.log("user just logout from the server : " + socket.email);
     delete OnlineUsers[socket.email];
   });
 

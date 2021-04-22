@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { userSchema } = require("./User");
 
 const ChatSchima = mongoose.Schema({
   name: { type: String },
@@ -20,23 +19,19 @@ exports.Chat = Chat;
 exports.CreateChat = CreateChat = async (users = [], type = 'friends', chatName = "friendsChat!") => {
   try {
     if (type === 'friends') {
-      let chat = Chat.findOne({ type: 'friends', users: [users[0]._id, users[1]._id] });
+      let chat = await Chat.findOne({ type: 'friends', users: { $in: [users[0]._id, users[1]._id] } });
       if (chat) {
-
+        console.log('old chat');
         return chat;
-      }
+      } else
+        console.log('didnt find')
     }
 
-    const userObg = {};
     let spyCode = Date.now().toString();
-    users.forEach((user, i) => {
-      spyCode.replace(`${i}`, user.firstName);
-      userObg[user._id] = user;
-    });
     let todayDate = Date.now();
     const newChat = new Chat({
       name: chatName,
-      users: userObg,
+      users,
       createAt: todayDate,
       updateAt: todayDate,
       type: type,

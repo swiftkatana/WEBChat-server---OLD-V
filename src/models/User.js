@@ -27,12 +27,18 @@ userSchema.method("filterUser", function () {
   return filterUser;
 });
 
-userSchema.statics.getUser = async function (id = 'id of the user', token = 'token of the user') {
-
+userSchema.statics.getUser = async function (email = 'email of the user', token = 'token of the user') {
+  return this.findOne({ email });
 }
 
 userSchema.statics.getUsers = async function (ids = []) {
-  return await this.model.find({ _id: { $in: ids } });
+  try {
+    if (!ids.length)
+      return [];
+    return await this.find({ _id: { $in: ids } });
+  } catch (error) {
+    throw new Error(error);
+  }
 
 }
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const { User } = require('../../models/User');
 const { responedList } = require('../../../respondList');
+const { FriendDB } = require('../../models/friend');
 
 const router = express.Router();
 
@@ -29,11 +30,10 @@ router.get("/getUserForSerach", async (req, res) => {
       updateAt: false,
       loginAt: false,
       chats: false,
-      connections: false,
       password: false,
     };
 
-    const connectionIds = [userDoc._id, ...Object.keys(userDoc.connections)]
+    const connectionIds = await FriendDB.getAllMyFriendsIds(userDoc._id, true);
     let filterUsers = {
       $and: [
         { email: { $regex: `.*${query}.*` } },
@@ -53,12 +53,13 @@ router.get("/getUserForSerach", async (req, res) => {
 
 
     }
-
-
-    res.send({ users });
+    if (!users.length)
+      res.send(responedList.searchUsersForFriend);
+    else
+      res.send({ users });
   } catch (error) {
     console.log(error);
-    res.send({ error: error });
+    res.send({ error });
   }
 
 });

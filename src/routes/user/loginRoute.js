@@ -12,9 +12,7 @@ router.get("/login", async (req, res) => {
       res.send(responedList.infoInvalid);
       return;
     }
-
-    let user = await User.findOne({ email })
-
+    let user = await User.getUser(email)
     if (!user) {
       res.send(responedList.usersNotFound);
       return;
@@ -29,7 +27,7 @@ router.get("/login", async (req, res) => {
     const match = await bcrypt.compare(password, user.password)
 
     if (!match) {
-      console.log("password not right\n" + err);
+      console.log("password not right\n");
       res.send(responedList.usersNotFound);
       return;
     }
@@ -43,6 +41,7 @@ router.get("/login", async (req, res) => {
     res.send({ user: user.filterUser() });
 
   } catch (error) {
+    console.log(error);
     res.send(responedList.DBError);
   }
 
