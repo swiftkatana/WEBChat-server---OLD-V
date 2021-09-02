@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
 
 console.clear();
 
-let OnlineUsers = {};
+let OnlineUsers = { };
 
 setInterval(
   () => console.log("OnlineUsers connected  :", Object.keys(OnlineUsers)),
